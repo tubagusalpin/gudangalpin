@@ -1,49 +1,55 @@
-```html
 <!DOCTYPE html>
 <html>
 <head>
-
-<meta charset="UTF-8">
 <title>Form Pengambilan Barang Gudang</title>
 
 <style>
 
 body{
 font-family:Arial;
-background:#f3f3f3;
+background:#f2f2f2;
 padding:40px;
 }
 
 .container{
 background:white;
-padding:25px;
-max-width:600px;
-margin:auto;
+padding:30px;
 border-radius:10px;
-box-shadow:0 5px 15px rgba(0,0,0,0.1);
+width:420px;
+margin:auto;
+box-shadow:0 0 10px rgba(0,0,0,0.15);
 }
 
-input,textarea{
+h2{
+text-align:center;
+}
+
+input,select{
 width:100%;
 padding:10px;
-margin:8px 0;
-border-radius:5px;
-border:1px solid #ccc;
+margin-top:10px;
+margin-bottom:15px;
 }
 
 button{
-background:#2563eb;
+background:#007bff;
 color:white;
-border:none;
 padding:12px;
+border:none;
 width:100%;
 font-size:16px;
-border-radius:6px;
 cursor:pointer;
+border-radius:5px;
 }
 
 button:hover{
-background:#1d4ed8;
+background:#0056b3;
+}
+
+#status{
+text-align:center;
+margin-top:15px;
+font-weight:bold;
 }
 
 </style>
@@ -54,63 +60,99 @@ background:#1d4ed8;
 
 <div class="container">
 
-<h2>Form Pengambilan Barang Gudang</h2>
+<h2>Form Pengambilan Barang</h2>
 
-<form id="formGudang">
+<input type="text" id="nama" placeholder="Nama Pengambil">
 
-<label>Nama Petugas</label>
-<input type="text" id="petugas" required>
+<input type="text" id="barang" placeholder="Nama Barang">
 
-<label>Nama Barang</label>
-<input type="text" id="barang" required>
+<select id="jenis">
+<option>Elektronik</option>
+<option>Peralatan</option>
+<option>Dokumen</option>
+<option>Lainnya</option>
+</select>
 
-<label>Jenis Barang</label>
-<input type="text" id="jenis" required>
+<label>Foto Barang</label>
+<input type="file" id="fotoBarang">
 
-<label>Keterangan</label>
-<textarea id="keterangan"></textarea>
+<label>Foto Before</label>
+<input type="file" id="fotoBefore">
 
-<button type="submit">Kirim Data</button>
+<label>Foto After</label>
+<input type="file" id="fotoAfter">
 
-</form>
+<button onclick="kirim()">Simpan Data</button>
+
+<p id="status"></p>
 
 </div>
 
+
 <script>
 
-const scriptURL = "https://script.google.com/macros/s/AKfycbzI1f2Ob793FgVpOjO0yLGD0Tc4kNqjhbLsGnjEr3BtKvMPwNeMETnCLU5IJeZi6Wrg/exec"
+const scriptURL = "https://script.google.com/macros/s/AKfycbzI1f2Ob793FgVpOjO0yLGD0Tc4kNqjhbLsGnjEr3BtKvMPwNeMETnCLU5IJeZi6Wrg/exec";
 
-document.getElementById("formGudang").addEventListener("submit",function(e){
+function convertBase64(file){
 
-e.preventDefault()
+return new Promise((resolve,reject)=>{
 
-let data = {
+let reader = new FileReader();
 
-petugas:document.getElementById("petugas").value,
-barang:document.getElementById("barang").value,
-jenis:document.getElementById("jenis").value,
-keterangan:document.getElementById("keterangan").value
+reader.readAsDataURL(file);
+
+reader.onload = ()=> resolve(reader.result);
+
+reader.onerror = error => reject(error);
+
+});
 
 }
 
+
+async function kirim(){
+
+document.getElementById("status").innerText="Uploading data...";
+
+let nama = document.getElementById("nama").value;
+let barang = document.getElementById("barang").value;
+let jenis = document.getElementById("jenis").value;
+
+let fotoBarangFile = document.getElementById("fotoBarang").files[0];
+let fotoBeforeFile = document.getElementById("fotoBefore").files[0];
+let fotoAfterFile = document.getElementById("fotoAfter").files[0];
+
+let fotoBarang = await convertBase64(fotoBarangFile);
+let fotoBefore = await convertBase64(fotoBeforeFile);
+let fotoAfter = await convertBase64(fotoAfterFile);
+
+let formData = new URLSearchParams();
+
+formData.append("nama",nama);
+formData.append("barang",barang);
+formData.append("jenis",jenis);
+formData.append("fotoBarang",fotoBarang);
+formData.append("fotoBefore",fotoBefore);
+formData.append("fotoAfter",fotoAfter);
+
 fetch(scriptURL,{
 method:"POST",
-body:JSON.stringify(data)
+body:formData
 })
-.then(res=>res.text())
-.then(res=>{
+.then(response=>{
 
-alert("Data berhasil dikirim ke spreadsheet!")
-
-document.getElementById("formGudang").reset()
+document.getElementById("status").innerText="✅ Data berhasil disimpan";
 
 })
+.catch(error=>{
 
-})
+document.getElementById("status").innerText="❌ Upload gagal";
+
+});
+
+}
 
 </script>
 
 </body>
-
 </html>
-```
