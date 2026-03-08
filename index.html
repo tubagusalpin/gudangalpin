@@ -1,6 +1,8 @@
+```html
 <!DOCTYPE html>
 <html>
 <head>
+
 <meta charset="UTF-8">
 <title>Form Pengambilan Barang Gudang</title>
 
@@ -8,37 +10,40 @@
 
 body{
 font-family:Arial;
-background:#f2f2f2;
+background:#f3f3f3;
 padding:40px;
 }
 
 .container{
 background:white;
-padding:30px;
-max-width:700px;
+padding:25px;
+max-width:600px;
 margin:auto;
 border-radius:10px;
 box-shadow:0 5px 15px rgba(0,0,0,0.1);
 }
 
-input,select,textarea{
+input,textarea{
 width:100%;
 padding:10px;
-margin-top:5px;
-margin-bottom:15px;
-border-radius:6px;
+margin:8px 0;
+border-radius:5px;
 border:1px solid #ccc;
 }
 
 button{
 background:#2563eb;
 color:white;
-padding:12px;
 border:none;
-border-radius:8px;
+padding:12px;
 width:100%;
 font-size:16px;
+border-radius:6px;
 cursor:pointer;
+}
+
+button:hover{
+background:#1d4ed8;
 }
 
 </style>
@@ -65,16 +70,7 @@ cursor:pointer;
 <label>Keterangan</label>
 <textarea id="keterangan"></textarea>
 
-<label>Foto Barang</label>
-<input type="file" id="fotoBarang" accept="image/*">
-
-<label>Foto Before</label>
-<input type="file" id="before" accept="image/*">
-
-<label>Foto After</label>
-<input type="file" id="after" accept="image/*">
-
-<button type="submit">Kirim Laporan</button>
+<button type="submit">Kirim Data</button>
 
 </form>
 
@@ -82,37 +78,20 @@ cursor:pointer;
 
 <script>
 
-const scriptURL = "PASTE_URL_APPS_SCRIPT_DISINI";
+const scriptURL = "https://script.google.com/macros/s/AKfycbzI1f2Ob793FgVpOjO0yLGD0Tc4kNqjhbLsGnjEr3BtKvMPwNeMETnCLU5IJeZi6Wrg/exec"
 
-function toBase64(file){
-return new Promise((resolve,reject)=>{
-const reader = new FileReader();
-reader.readAsDataURL(file);
-reader.onload = ()=>resolve(reader.result);
-reader.onerror = error => reject(error);
-});
-}
+document.getElementById("formGudang").addEventListener("submit",function(e){
 
-document.getElementById("formGudang").addEventListener("submit", async function(e){
-
-e.preventDefault();
-
-let fotoBarang = document.getElementById("fotoBarang").files[0];
-let before = document.getElementById("before").files[0];
-let after = document.getElementById("after").files[0];
+e.preventDefault()
 
 let data = {
 
-petugas: document.getElementById("petugas").value,
-barang: document.getElementById("barang").value,
-jenis: document.getElementById("jenis").value,
-keterangan: document.getElementById("keterangan").value,
+petugas:document.getElementById("petugas").value,
+barang:document.getElementById("barang").value,
+jenis:document.getElementById("jenis").value,
+keterangan:document.getElementById("keterangan").value
 
-fotoBarang: fotoBarang ? await toBase64(fotoBarang) : "",
-before: before ? await toBase64(before) : "",
-after: after ? await toBase64(after) : ""
-
-};
+}
 
 fetch(scriptURL,{
 method:"POST",
@@ -120,13 +99,18 @@ body:JSON.stringify(data)
 })
 .then(res=>res.text())
 .then(res=>{
-alert("Data berhasil dikirim");
-document.getElementById("formGudang").reset();
+
+alert("Data berhasil dikirim ke spreadsheet!")
+
+document.getElementById("formGudang").reset()
+
 })
 
-});
+})
 
 </script>
 
 </body>
+
 </html>
+```
